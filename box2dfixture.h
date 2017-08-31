@@ -46,9 +46,11 @@ class Box2DFixture : public QObject
     Q_PROPERTY(CategoryFlags categories READ categories WRITE setCategories NOTIFY categoriesChanged)
     Q_PROPERTY(CategoryFlags collidesWith READ collidesWith WRITE setCollidesWith NOTIFY collidesWithChanged)
     Q_PROPERTY(int groupIndex READ groupIndex WRITE setGroupIndex NOTIFY groupIndexChanged)
+    Q_PROPERTY(QQuickItem* children READ getChildren WRITE setChildren NOTIFY childrenChanged)
 
     Q_ENUMS(CategoryFlag)
     Q_FLAGS(CategoryFlags)
+    Q_CLASSINFO("DefaultProperty", "children")
 
 public:
     explicit Box2DFixture(QObject *parent = 0);
@@ -85,6 +87,9 @@ public:
     void initialize(Box2DBody *body);
     void recreateFixture();
 
+    QQuickItem *getChildren() const;
+    void setChildren(QQuickItem *list);
+
     Q_INVOKABLE Box2DBody *getBody() const;
 
 signals:
@@ -95,6 +100,7 @@ signals:
     void categoriesChanged();
     void collidesWithChanged();
     void groupIndexChanged();
+    void childrenChanged();
 
     void beginContact(Box2DFixture *other);
     void endContact(Box2DFixture *other);

@@ -34,6 +34,7 @@
 
 #include "Common/b2Math.h"
 
+
 Box2DFixture::Box2DFixture(QObject *parent) :
     QObject(parent),
     mFixture(0),
@@ -176,6 +177,17 @@ void Box2DFixture::recreateFixture()
     if (mFixture)
         mBody->body()->DestroyFixture(mFixture);
     initialize(mBody);
+}
+
+QQuickItem *Box2DFixture::getChildren() const
+{
+    return qobject_cast<QQuickItem*>(this->children().first());
+}
+
+void Box2DFixture::setChildren(QQuickItem *list)
+{
+    list->setParent(this);
+    emit childrenChanged();
 }
 
 Box2DBody *Box2DFixture::getBody() const
