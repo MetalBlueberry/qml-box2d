@@ -1,21 +1,25 @@
-import QtQuick 2.1;
+import QtQuick 2.4;
 import QtQuick.Window 2.1;
+import QtQuick.Layouts 1.1
 import Box2D 2.0;
 //import "shared"
 
 Window {
     id: window;
-    width: 1000;
-    height: 600;
-    visible: true;
+    width: 800 + listView.width;
+    height: 600
 
-    property bool listVisible: true;
+    visible: true;
 
     ListModel {
         id: scenesList;
         ListElement {
             name: "accelerometer"
             path: "accelerometer/accelerometer.qml"
+        }
+        ListElement {
+            name: "angletracking"
+            path: "angletracking/angleTracking.qml"
         }
         ListElement {
             name: "boxes"
@@ -94,6 +98,10 @@ Window {
             path: "revolute/revolute.qml"
         }
         ListElement {
+            name: "revolute plot angle"
+            path: "revoluteplotangle/revolutePlotAngle.qml"
+        }
+        ListElement {
             name: "rope"
             path: "rope/main.qml"
         }
@@ -107,69 +115,79 @@ Window {
         }
     }
 
-    Loader {
-        id: loader;
-        anchors {
-            left: parent.left;
-            right: parent.right;
-            top: parent.top;
-            bottom: parent.bottom;
-            topMargin: backButton.height;
-        }
-    }
+    RowLayout {
+        width: parent.width
+        height: parent.height
+        spacing: 0
 
-    Rectangle {
-        id: backButton;
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        width: 300;
-        height: 40;
-        color: "grey";
-        border.width: 1;
-        border.color: "black";
-        visible: !listVisible;
+        // 1st pane
+        Rectangle {
+            id: firstPane
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: parent.height
+            Layout.fillHeight: true
 
-        Text {
-            anchors.centerIn: parent;
-            text: "Back";
-        }
+            border.color: "#DEDEDE"
+            border.width: 1
 
-        MouseArea {
-            anchors.fill: parent;
-            onClicked: {
-                listVisible = true;
-            }
-        }
-    }
-
-    ListView {
-        id: listView
-        anchors.left: parent.left;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.leftMargin: listVisible ? 0 : -width;
-        width: 200;
-        model: scenesList;
-        delegate: Rectangle {
-            height: 50;
-            width: 200;
-            color: "lightgrey"
-
-            Text {
-                anchors.centerIn: parent;
-                text: name;
-            }
 
             MouseArea {
-                anchors.fill: parent;
-                onClicked: {
-                    loader.source = path
-                    listVisible = false;
+            anchors.fill: listView
+            onWheel: listView.flick(0, wheel.angleDelta.y * 5)
+            }
+
+
+            ListView {
+                id: listView
+
+                width: parent.width
+                height: parent.height
+
+                // focus: true
+
+                model: scenesList;
+                delegate: Item {
+                    height: 50;
+                    width: parent.width;
+
+                    Text {
+                        anchors.centerIn: parent;
+                        text: name;
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent;
+                        onClicked: {
+                            listView.currentIndex = index
+                            sceneLoader.source = path
+                        }
+                    }
+                }
+
+                highlightFollowsCurrentItem: true
+                highlight: Rectangle {
+                    id: highlightRectangle
+                    width: parent.width
+                    height: 50
+                    color: "#DEDEDE"
                 }
             }
         }
 
+        // 2nd pane
+        Item {
+            id: secondPane
+            Layout.preferredWidth: 800
+            Layout.preferredHeight: parent.height
+            Layout.fillHeight: true
 
+            Loader {
+                id: sceneLoader
+                width: parent.width
+                height: parent.height
+                focus: true
+            }
+        }
     }
 }
 
